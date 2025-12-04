@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import { getAuthUser } from '@/lib/auth';
 import { completeToken } from '@/lib/queueUtils';
-import { emitQueueChanged, emitTokenUpdate, emitTableUpdate } from '@/lib/socket';
+import { emitQueueChanged, emitTokenUpdated, emitTableUpdated } from '@/lib/socket';
 import Token from '@/lib/models/Token';
 
 export async function POST(
@@ -27,9 +27,9 @@ export async function POST(
         await completeToken(params.id, user.email);
 
         // Emit socket events
-        emitTokenUpdate(params.id, { status: 'completed' });
+        emitTokenUpdated(params.id);
         if (tableId) {
-            emitTableUpdate(tableId, { status: 'free' });
+            emitTableUpdated(tableId);
         }
         emitQueueChanged();
 

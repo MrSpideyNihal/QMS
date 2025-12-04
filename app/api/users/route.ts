@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
+import connectDB from '@/lib/db';
 import User from '@/lib/models/User';
 import { getAuthUser, isDeveloper } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
     try {
-        const user = await getAuthUser(request);
+        const user = await getAuthUser();
 
         if (!user || !isDeveloper(user)) {
             return NextResponse.json(

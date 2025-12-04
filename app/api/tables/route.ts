@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Table from '@/lib/models/Table';
 import { getAuthUser, isAdmin } from '@/lib/auth';
-import { emitTableUpdate } from '@/lib/socket';
+import { emitTableUpdated } from '@/lib/socket';
 
 export async function GET() {
     try {
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Emit socket event
-        emitTableUpdate(table._id.toString(), table);
+        emitTableUpdated(table._id.toString());
 
         return NextResponse.json({ success: true, table }, { status: 201 });
     } catch (error: any) {

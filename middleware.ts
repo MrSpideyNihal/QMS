@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from './lib/auth';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     const token = request.cookies.get('auth-token')?.value;
     const { pathname } = request.nextUrl;
 
@@ -23,7 +23,7 @@ export function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/login', request.url));
         }
 
-        const user = verifyToken(token);
+        const user = await verifyToken(token);
         if (!user) {
             const response = NextResponse.redirect(new URL('/login', request.url));
             response.cookies.delete('auth-token');
@@ -48,7 +48,7 @@ export function middleware(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const user = verifyToken(token);
+        const user = await verifyToken(token);
         if (!user) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }

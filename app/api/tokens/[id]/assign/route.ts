@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import { getAuthUser } from '@/lib/auth';
 import { assignTableToToken } from '@/lib/queueUtils';
-import { emitQueueChanged, emitTokenUpdate, emitTableUpdate } from '@/lib/socket';
+import { emitQueueChanged, emitTokenUpdated, emitTableUpdated } from '@/lib/socket';
 
 export async function POST(
     request: NextRequest,
@@ -34,9 +34,9 @@ export async function POST(
         );
 
         // Emit socket events
-        emitTokenUpdate(params.id, { status: 'seated' });
+        emitTokenUpdated(params.id);
         for (const tableId of tableIds) {
-            emitTableUpdate(tableId, { status: 'occupied' });
+            emitTableUpdated(tableId);
         }
         emitQueueChanged();
 

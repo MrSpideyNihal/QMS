@@ -1,21 +1,28 @@
-import jwt from 'jsonwebtoken';
+import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production';
+const encodedKey = new TextEncoder().encode(JWT_SECRET);
 
 export interface JWTPayload {
     userId: string;
     email: string;
     role: 'developer' | 'admin' | 'staff';
+    [key: string]: any;
 }
 
-export function signToken(payload: JWTPayload): string {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+export async function signToken(payload: JWTPayload): Promise<string> {
+    return new SignJWT(payload)
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .sign(encodedKey);
 }
 
-export function verifyToken(token: string): JWTPayload | null {
+export async function verifyToken(token: string): Promise<JWTPayload | null> {
     try {
-        return jwt.verify(token, JWT_SECRET) as JWTPayload;
+        const { payload } = await jwtVerify(token, encodedKey);
+        return payload as unknown as JWTPayload;
     } catch (error) {
         return null;
     }
@@ -30,7 +37,7 @@ export async function getAuthUser(): Promise<JWTPayload | null> {
             return null;
         }
 
-        return verifyToken(token);
+        return await verifyToken(token);
     } catch (error) {
         return null;
     }

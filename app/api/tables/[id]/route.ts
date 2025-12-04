@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Table from '@/lib/models/Table';
 import { getAuthUser, isAdmin } from '@/lib/auth';
-import { emitTableUpdate } from '@/lib/socket';
+import { emitTableUpdated } from '@/lib/socket';
 
 export async function GET(
     request: NextRequest,
@@ -65,8 +65,7 @@ export async function PATCH(
 
         await table.save();
 
-        // Emit socket event
-        emitTableUpdate(table._id.toString(), table);
+        emitTableUpdated(table._id.toString());
 
         return NextResponse.json({ success: true, table });
     } catch (error: any) {
@@ -109,8 +108,7 @@ export async function DELETE(
 
         await Table.findByIdAndDelete(params.id);
 
-        // Emit socket event
-        emitTableUpdate(params.id, { deleted: true });
+        emitTableUpdated(params.id);
 
         return NextResponse.json({ success: true });
     } catch (error: any) {

@@ -4,7 +4,7 @@ import Token from '@/lib/models/Token';
 import OverrideLog from '@/lib/models/OverrideLog';
 import { getAuthUser } from '@/lib/auth';
 import { recalculateQueuePositions } from '@/lib/queueUtils';
-import { emitQueueChanged, emitTokenUpdate } from '@/lib/socket';
+import { emitQueueChanged, emitTokenUpdated } from '@/lib/socket';
 
 export async function GET(
     request: NextRequest,
@@ -86,7 +86,7 @@ export async function PATCH(
         }
 
         // Emit socket events
-        emitTokenUpdate(token._id.toString(), token);
+        emitTokenUpdated(token._id.toString());
         if (queueChanged) {
             emitQueueChanged();
         }
@@ -136,7 +136,7 @@ export async function DELETE(
         });
 
         // Emit socket events
-        emitTokenUpdate(token._id.toString(), token);
+        emitTokenUpdated(token._id.toString());
         emitQueueChanged();
 
         return NextResponse.json({ success: true });
